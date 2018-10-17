@@ -79,6 +79,8 @@ function smartfs.inventory_mod()
 		return "unified_inventory"
 	elseif minetest.global_exists("inventory_plus") then
 		return "inventory_plus"
+	elseif minetest.global_exists("sfinv") then
+		return "sfinv"
 	else
 		return nil
 	end
@@ -171,6 +173,35 @@ smartfs._ldef.inventory_plus = {
 			_show_ = function(state)
 				inventory_plus.set_inventory_formspec(minetest.get_player_by_name(state.location.player), state:_buildFormspec_(true))
 			end
+		}
+	end
+}
+
+-- Sfinv plugin
+smartfs._ldef.sfinv = {
+	add_to_inventory = function(form, icon, title)
+		sfinv.register_page(form.name, {
+			title = title,
+			get = function(self, player, context)
+				local name = player:get_player_name()
+				local statelocation = smartfs._ldef.sfinv._make_state_location_(player)
+				local state = smartfs._makeState_(form, nil, statelocation, name)
+				local fs = ""
+				if form.form_setup_callback(state) ~= "false" then
+					smartfs.inv[name] = state
+					fs = state:_buildFormspec_(false)
+				end
+				return sfinv.make_formspec(player, context, fs, true)
+			end
+		})
+	end,
+	_make_state_location_ = function(player)
+		return {
+			type = "inventory",
+			player = player,
+			_show_ = function(state)
+			    sfinv.set_page(state.location.player, state.def.name)
+			end,
 		}
 	end
 }
