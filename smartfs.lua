@@ -184,7 +184,7 @@ smartfs._ldef.sfinv = {
 			title = title,
 			get = function(self, player, context)
 				local name = player:get_player_name()
-				local statelocation = smartfs._ldef.sfinv._make_state_location_(player)
+				local statelocation = smartfs._ldef.sfinv._make_state_location_(name)
 				local state = smartfs._makeState_(form, nil, statelocation, name)
 				local fs = ""
 				if form.form_setup_callback(state) ~= "false" then
@@ -192,15 +192,28 @@ smartfs._ldef.sfinv = {
 					fs = state:_buildFormspec_(false)
 				end
 				return sfinv.make_formspec(player, context, fs, true)
-			end
+			end,
+			on_player_receive_fields = function(self, player, _, fields)
+				local name = player:get_player_name()
+				if smartfs.inv[name] then
+					smartfs.inv[name]:_sfs_on_receive_fields_(name, fields)
+				end
+			end,
+			on_leave = function(self, player)
+				local name = player:get_player_name()
+				if smartfs.inv[name] then
+					smartfs.inv[name].players:disconnect(name)
+				end
+			end,
 		})
 	end,
 	_make_state_location_ = function(player)
 		return {
 			type = "inventory",
+			inventory_handles_fields = true,
 			player = player,
 			_show_ = function(state)
-			    sfinv.set_page(state.location.player, state.def.name)
+				sfinv.set_page(minetest.get_player_by_name(state.location.player), state.def.name)
 			end,
 		}
 	end
@@ -378,7 +391,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				smartfs.opened[name] = nil
 			end
 		end
-	elseif smartfs.inv[name] and smartfs.inv[name].location.type == "inventory" then
+	elseif smartfs.inv[name] and smartfs.inv[name].location.type == "inventory" and not smartfs.inv[name].location.inventory_handles_fields then
 		local state = smartfs.inv[name]
 		state:_sfs_on_receive_fields_(name, fields)
 	end
