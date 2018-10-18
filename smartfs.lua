@@ -184,13 +184,20 @@ smartfs._ldef.sfinv = {
 			title = title,
 			get = function(self, player, context)
 				local name = player:get_player_name()
-				local statelocation = smartfs._ldef.sfinv._make_state_location_(name)
-				local state = smartfs._makeState_(form, nil, statelocation, name)
-				local fs = ""
-				if form.form_setup_callback(state) ~= "false" then
+				local state
+				if smartfs.inv[name] then
+					state = smartfs.inv[name]
+				else
+					local statelocation = smartfs._ldef.sfinv._make_state_location_(name)
+					state = smartfs._makeState_(form, nil, statelocation, name)
 					smartfs.inv[name] = state
-					fs = state:_buildFormspec_(false)
+					if form.form_setup_callback(state) ~= false then
+						smartfs.inv[name] = state
+					else
+						return ""
+					end
 				end
+				local fs = state:_buildFormspec_(false)
 				return sfinv.make_formspec(player, context, fs, true)
 			end,
 			on_player_receive_fields = function(self, player, _, fields)
@@ -213,7 +220,7 @@ smartfs._ldef.sfinv = {
 			inventory_handles_fields = true,
 			player = player,
 			_show_ = function(state)
-				sfinv.set_page(minetest.get_player_by_name(state.location.player), state.def.name)
+				sfinv.set_player_inventory_formspec(minetest.get_player_by_name(state.location.player))
 			end,
 		}
 	end
