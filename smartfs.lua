@@ -1454,7 +1454,7 @@ smartfs.element("inventory", {
 	setList = function(self, list)
 		self.data.list = list
 	end,
-	getList = function(self, list)
+	getList = function(self)
 		return self.data.list or self.name
 	end,
 	setIndex = function(self,index)
