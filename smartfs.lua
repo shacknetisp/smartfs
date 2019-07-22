@@ -1421,7 +1421,7 @@ smartfs.element("inventory", {
 		return "list["..
 			(self.data.invlocation or "current_player") ..
 			";"..
-			self.name..    --no namespacing
+			(self.data.list or self.name) ..    --no namespacing
 			";"..
 			self.data.pos.x..","..self.data.pos.y..
 			";"..
@@ -1450,6 +1450,12 @@ smartfs.element("inventory", {
 	end,
 	useDetached = function(self, name)
 		self.data.invlocation = "detached:" .. name
+	end,
+	setList = function(self, list)
+		self.data.list = list
+	end,
+	getList = function(self, list)
+		return self.data.list or self.name
 	end,
 	setIndex = function(self,index)
 		self.data.index = index
