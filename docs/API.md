@@ -149,7 +149,7 @@
   * element:usePlayer( name ) - use a player inventory other than the current player
 * element:getLocation() - returns the inventory location (default: current_player)
 * element:setList( list ) - set a custom inventory list name or nil for the default (the element's name)
-* element:getList() - returns the list (defaults to the element's name)
+* element:getList() - returns the list name (defaults to the element's name)
 * element:setIndex( index ) - set the inventory starting index
 * element:getIndex() - returns the inventory starting index
 
